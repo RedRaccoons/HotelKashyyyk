@@ -18,6 +18,7 @@ char* genID(char lName[21])
   strcat(tmp, randomID);
   
   return tmp;
+  free(tmp);
 }
 
 int main()
