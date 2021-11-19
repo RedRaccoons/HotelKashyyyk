@@ -5,7 +5,7 @@
 - ``git add check-in.c`` add the file(s) you have changed
 - ``git commit -m "Fixed Overflow Bug"``
 - ``git branch -M main``
-- ``git remote add origin https://github.com/RedRaccoons/HotelKashyyyk`
+- ``git remote add origin`` https://github.com/RedRaccoons/HotelKashyyyk
 - ``git push -u origin main``
 
 # Do I have to use this?
