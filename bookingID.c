@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define USER_PROPERTIES 20 // (e.g) ID, First Name, Surname
+#define USER_PROPERTIES 3 // (e.g) ID, First Name, Surname
 
 typedef char* BookingID; // Last name could be 20 & ID is 4
 
