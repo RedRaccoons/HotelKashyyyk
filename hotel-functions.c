@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <stdio.h>
 #include "hotel-functions.h"
-
+#include <stdlib.h>
+#include <ctype.h>
 
 char* genID(char lName[21])
 {
@@ -18,3 +20,4 @@ char* genID(char lName[21])
   return tmp;
   free(tmp);
 }
+

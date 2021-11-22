@@ -6,14 +6,10 @@
 #include "hotel-functions.h"
 
 #define MAX_SEATS 4
-#define USER_PROPERTIES 3
+#define USER_PROPERTIES 4
+
 typedef char* BookingID;
 typedef int Table;
-
-char* toLowerCase(char* str);
-char* getUserInfo(BookingID id, char* prop);
-char* getInput(int maxLength);
-int isValidUser(BookingID id);
 
 /* ## Book a dinner table */
 /* There are 3 dining tables: Endor, Naboo and Tatooine that each seat 4 people. */
@@ -30,6 +26,11 @@ int isValidUser(BookingID id);
 /* - If successful, it should give the user a message saying their table is booked and update the tables */
 /* available in that area for that sitting time */
 
+char* toLowerCase(char* str);
+char* getUserInfo(BookingID id, char* prop);
+char* getInput(int maxLength);
+int isValidUser(BookingID id);
+void removeUser(BookingID id);
 
 // Tables (0 means not available, 1 means available)
 const char* tables[9] = { "endor", "naboo", "tatooine" };
@@ -39,17 +40,16 @@ int times[2] = { 1900, 2100 };
 float boardTimes[2] = { 1, 0.5 }; // 1 meaning full board, 0.5 meaning half board
 
 // Users Array
-char users[12][USER_PROPERTIES][20] = { { "toby1234", "toby", "bridle" }, { "doe1234", "hon", "doe" } };
-
+char* users[12][USER_PROPERTIES][20] = { { "toby1234", "toby", "bridle" }, { "doe1234", "john", "doe" } };
 int main (int argc, char *argv[])
 {
-  printf("Firstname: %s", getUserInfo("toby1234", "firstname"));
   char* id;
   char* boardType;
   
   // Get Booking ID
   printf("Booking ID: ");
   id = getInput(19); // Get Input (19 Chars MAXIMUM)
+  /* printf("%s", getUserInfo(id, "index")); */
   if(!isValidUser(id)) // If not in Array of Users
   {
     printf("Sorry, it looks like you haven't booked!");
@@ -72,6 +72,7 @@ int main (int argc, char *argv[])
   return 0;
 }
 
+
 char* getInput(int maxLength)
 {
 
@@ -86,6 +87,7 @@ char* getInput(int maxLength)
   }
 
   tmp[maxLength + 1] = 0;
+  fflush(stdin); // Clears the input
   return tmp;
 }
 
@@ -93,27 +95,33 @@ int isValidUser(BookingID id)
 {
   // Return 0 if not a valid user
   // Return 1 if a valid user
+  if((int) *id == 0) return 0;
   for (int user = 0; user < 12; ++user)
   {
-    if (strcmp(users[user][0], id) == 0) return 1;
+    if (strcmp(*users[user][0], id) == 0) return 1;
   }
   return 0;
 }
 
 char* getUserInfo(BookingID id, char* prop)
 {
+  if(isspace(*id)) printf("Whitespace!!!!!");
   // Return 0 if not a valid user
   // Return 1 if a valid user
+  char *tmp = malloc(sizeof(char) * 3);
   for (int user = 0; user < 12; ++user)
   {
-    if (strcmp(users[user][0], id) == 0)
+    if (strcmp(*users[user][0], id) == 0)
     {
       switch(*prop)
       {
         case *"firstname":
-          return users[user][1];
+          return *users[user][1];
         case *"lastname":
-          return users[user][2];
+          return *users[user][2];
+        case *"index":
+          sprintf(tmp, "%d", user);
+          return (char*) tmp;
       }
     }
   }
