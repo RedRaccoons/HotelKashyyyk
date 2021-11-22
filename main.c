@@ -2,13 +2,16 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "hotel-functions.h"
 
 #define MAX_SEATS 4
-#define USER_PROPERTIES 6
+#define USER_PROPERTIES 3
 typedef char* BookingID;
 typedef int Table;
 
+char* toLowerCase(char* str);
+char* getUserInfo(BookingID id, char* prop);
 char* getInput(int maxLength);
 int isValidUser(BookingID id);
 
@@ -36,10 +39,11 @@ int times[2] = { 1900, 2100 };
 float boardTimes[2] = { 1, 0.5 }; // 1 meaning full board, 0.5 meaning half board
 
 // Users Array
-char users[12][USER_PROPERTIES][20] = { { "toby1234", "toby", "bridle" }, { "clem1234" } };
+char users[12][USER_PROPERTIES][20] = { { "toby1234", "toby", "bridle" }, { "doe1234", "hon", "doe" } };
 
 int main (int argc, char *argv[])
 {
+  printf("Firstname: %s", getUserInfo("toby1234", "firstname"));
   char* id;
   char* boardType;
   
@@ -56,8 +60,10 @@ int main (int argc, char *argv[])
 
   // Get Board Type
   printf("Board Type:\t(Full, Half)\n");
-  boardType = getInput(4);
-  if(strcmp(boardType, "Full") != 0 && strcmp(boardType, "Half") != 0)
+  boardType = toLowerCase(getInput(4));
+  for(int i = 0; i < sizeof(boardType); ++i) boardType[i] = tolower(boardType[i]);
+
+  if(strcmp(boardType, "full") != 0 && strcmp(boardType, "half") != 0)
   {
     printf("Please enter a valid board type!");
     return 0;
@@ -92,4 +98,33 @@ int isValidUser(BookingID id)
     if (strcmp(users[user][0], id) == 0) return 1;
   }
   return 0;
+}
+
+char* getUserInfo(BookingID id, char* prop)
+{
+  // Return 0 if not a valid user
+  // Return 1 if a valid user
+  for (int user = 0; user < 12; ++user)
+  {
+    if (strcmp(users[user][0], id) == 0)
+    {
+      switch(*prop)
+      {
+        case *"firstname":
+          return users[user][1];
+        case *"lastname":
+          return users[user][2];
+      }
+    }
+  }
+  return "Invalid User";
+}
+
+char* toLowerCase(char* str)
+{
+  char* tmp = calloc(strlen(str), sizeof(char));
+  for(int ch = 0; ch < sizeof(str); ++ch) tmp[ch] = tolower(str[ch]);
+  tmp[strlen(str)] = 0;
+
+  return tmp;
 }
