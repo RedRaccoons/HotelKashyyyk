@@ -1,23 +1,19 @@
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <stdio.h>
 #include "hotel-functions.h"
-#include <stdlib.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-char* genID(char lName[21])
-{
+char *genID(char lastname[21]) {
   srand(time(NULL));
-  char* tmp = malloc(sizeof(char) * 24);
-  char randomID[5] = { "" };
+  char *tmp = malloc(sizeof(char) * 24);
+  char randomID[5] = {""};
 
-  for (int i = 0; i < 4; ++i) randomID[i] = rand() % 10 + '0';
-
-  strcat(tmp, lName);
+  for (int i = 0; i < 4; ++i)
+    randomID[i] = rand() % 10 + '0';
+  strncpy(tmp, lastname, 3);
   strcat(tmp, randomID);
-  
-  return tmp;
-  free(tmp);
-}
 
+  return tmp;
+}
