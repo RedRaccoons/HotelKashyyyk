@@ -78,7 +78,6 @@ int main() {
 
   char* end;
   int tn = strtol(tableNum, &end, 10);
-  // printf("%d, %lu", tn, ARRAY_LEN(tables)-2);
   if(tn - 1 > ARRAY_LEN(tables) - 2)
   {
     if(tableAvailable[1][tn - ARRAY_LEN(tables)] == 1){
