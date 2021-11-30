@@ -1,138 +1,110 @@
 #include <stdio.h>
-#include <time.h>
-#include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "hotel-functions.h"
+#include <string.h>
 
 #define MAX_SEATS 4
-#define USER_PROPERTIES 4
 
-typedef char* BookingID;
-typedef int Table;
+#define ARRAY_LEN(arr) (size_t)(sizeof(arr)/sizeof((arr)[0]))
+#define PARTY_SIZE(party) ((int) *users[party][2] + (int) *users[party][3]) - '0' - '0'
 
-/* ## Book a dinner table */
-/* There are 3 dining tables: Endor, Naboo and Tatooine that each seat 4 people. */
-/* Meals are served at 2 sittings: 7pm and 9pm, every day of the week. */
-/* Your program should: */
-/* - Ask for the guest’s BookingID and, if it exists in the system (i.e. they are a current guest), it should */
-/* check: */
-/*   - Whether they are staying FB or HB. If not, they cannot book a table. */
-/*   - Then, it must check if there is a free table for the number of people in that party (looked up */
-/*   from the booking data) */
-/* - Display options showing the table names and the times that have space OR output an unavailable */
-/* message if no options exist */
-/* - It should then ask the user to input which table & time they want to book. */
-/* - If successful, it should give the user a message saying their table is booked and update the tables */
-/* available in that area for that sitting time */
+typedef char BookingID[7];
 
-char* toLowerCase(char* str);
-char* getUserInfo(BookingID id, char* prop);
-char* getInput(int maxLength);
-int isValidUser(BookingID id);
-void removeUser(BookingID id);
+float isUser(BookingID id);
 
-// Tables (0 means not available, 1 means available)
-const char* tables[9] = { "endor", "naboo", "tatooine" };
+char tables[4][10] = {"Endor", "Naboo", "Tatooine"};
+int sittings[2] = {1700, 1900};
+int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { 0 }; // 0 Means is Free, 1 not Free 
 
-// Different Times
-int times[2] = { 1900, 2100 };
-float boardTimes[2] = { 1, 0.5 }; // 1 meaning full board, 0.5 meaning half board
+/* Format
+* 1 User:
+*   [0 - 5] BookingID
+*   [6-15] DOB 
+*   [16] Amount of Children
+*   [17] Amount of Adults
+*   [18-19] Board Type 
+*   [20] Newpape
+*   [21] Booking
+*/
+//                           BookingID    DOB       Kids  Adults Board
+char users[100][9][11] = { { "tob123", "21/06/2005", "1", "2", "HB", "A", "B"}, { "dav461" } };
+int main() {
+  BookingID id;
+  printf("\033cPlease enter your Booking ID\t(e.g doe123)\n");
+  fgets(id, 7, stdin);
 
-// Users Array
-char* users[12][USER_PROPERTIES][20] = { { "toby1234", "toby", "bridle" }, { "doe1234", "john", "doe" } };
-int main (int argc, char *argv[])
-{
-  char* id;
-  char* boardType;
-  
-  // Get Booking ID
-  printf("Booking ID: ");
-  id = getInput(19); // Get Input (19 Chars MAXIMUM)
-  /* printf("%s", getUserInfo(id, "index")); */
-  if(!isValidUser(id)) // If not in Array of Users
+  int userDataIndex = isUser(id);
+
+  // Check if Valid User
+  if(userDataIndex == -1)
   {
-    printf("Sorry, it looks like you haven't booked!");
-    return 0;
-  }
-  free(id); // Free the Memory that `id` took up
-
-
-  // Get Board Type
-  printf("Board Type:\t(Full, Half)\n");
-  boardType = toLowerCase(getInput(4));
-  for(int i = 0; i < sizeof(boardType); ++i) boardType[i] = tolower(boardType[i]);
-
-  if(strcmp(boardType, "full") != 0 && strcmp(boardType, "half") != 0)
-  {
-    printf("Please enter a valid board type!");
-    return 0;
+    printf("Not a Valid Booking ID!");
+    return 1;
   }
 
-  return 0;
-}
-
-
-char* getInput(int maxLength)
-{
-
-  char *tmp = calloc(maxLength + 1, sizeof(char));
-
-  int c;
-  int i = 0;
-  while( (c = getchar() ) != '\n' && c != EOF && i < maxLength)
+  // Check if Full / Half Board
+  if(strcmp(users[userDataIndex][4], "HB") != 0 && strcmp(users[userDataIndex][4], "FB") != 0)
   {
-    tmp[i] = (char) c;
-    i++;
+    printf("You cannot book a table!");
+    return 1;
   }
 
-  tmp[maxLength + 1] = 0;
-  fflush(stdin); // Clears the input
-  return tmp;
-}
-
-int isValidUser(BookingID id)
-{
-  // Return 0 if not a valid user
-  // Return 1 if a valid user
-  if((int) *id == 0) return 0;
-  for (int user = 0; user < 12; ++user)
+  // Check if theres a free table
+  printf("\n\nSeats Available\t\tParty Size - %d\n\t\tTimes\n\t17:00\t\t19:00\n\n", PARTY_SIZE(userDataIndex));
+  for (int table = 0; table < ARRAY_LEN(tables) - 1; table++)
   {
-    if (strcmp(*users[user][0], id) == 0) return 1;
+    // Set Color
+
+    char *color;
+    if(tableAvailable[0][table] == 0 && MAX_SEATS >= PARTY_SIZE(userDataIndex)) color = "\033[0;32m";      // Green
+    if(tableAvailable[0][table] == 1 || MAX_SEATS < PARTY_SIZE(userDataIndex)) color = "\033[0;31m";   // Red
+
+    table != (ARRAY_LEN(tableAvailable))-1 ? printf("\t%s%d. %s\t", color, table + 1, tables[table]) : printf("\t%s%d. %s\t", color, table + 1, tables[table]);
+
+    if(tableAvailable[1][table] == 0 && MAX_SEATS >= PARTY_SIZE(userDataIndex)) color = "\033[0;32m";      // Green
+    if(tableAvailable[1][table] == 1 || MAX_SEATS < PARTY_SIZE(userDataIndex)) color = "\033[0;31m";   // Red
+
+    printf("%s%lu. %s\n", color, table + ARRAY_LEN(tables), tables[table]);
+
+    // Reset Color
+   if(table == (ARRAY_LEN(tables)) - 2) printf("\033[0m\n");
+
   }
-  return 0;
-}
 
-char* getUserInfo(BookingID id, char* prop)
-{
-  if(isspace(*id)) printf("Whitespace!!!!!");
-  // Return 0 if not a valid user
-  // Return 1 if a valid user
-  char *tmp = malloc(sizeof(char) * 3);
-  for (int user = 0; user < 12; ++user)
+
+  printf("Which Table would you like to Book?\t(0 to exit)\n\n");
+  char tableNum[ARRAY_LEN(tables[0])];
+  fflush(stdin);
+  fgets(tableNum, ARRAY_LEN(tables[0]) , stdin);
+
+  char* end;
+  int tn = strtol(tableNum, &end, 10);
+  // printf("%d, %lu", tn, ARRAY_LEN(tables)-2);
+  if(tn - 1 > ARRAY_LEN(tables) - 2)
   {
-    if (strcmp(*users[user][0], id) == 0)
-    {
-      switch(*prop)
-      {
-        case *"firstname":
-          return *users[user][1];
-        case *"lastname":
-          return *users[user][2];
-        case *"index":
-          sprintf(tmp, "%d", user);
-          return (char*) tmp;
-      }
+    if(tableAvailable[1][tn - ARRAY_LEN(tables)] == 1){
+      printf("Sorry, that table has already been booked!\n");
+    } else {
+      tableAvailable[1][tn - ARRAY_LEN(tables)] = 1;
+      printf("Booked %s for 19:00", tables[ tn - (ARRAY_LEN(tables)) ]);
+    }
+  } else {
+    if(tableAvailable[0][tn-1] == 1){
+      printf("Sorry, that table has already been booked!\n");
+    } else {
+      tableAvailable[0][tn-1] = 1;
+      printf("Booked %s for 17:00", tables[tn-1]);
     }
   }
-  return "Invalid User";
 }
 
-char* toLowerCase(char* str)
-{
-  char* tmp = calloc(strlen(str), sizeof(char));
-  for(int ch = 0; ch < sizeof(str); ++ch) tmp[ch] = tolower(str[ch]);
-  tmp[strlen(str)] = 0;
+// Return the User Index of a Valid User
+float isUser(BookingID id) {
+  // If is user, return the index it is at
+  // Else, return -1
 
-  return tmp;
+  for (int user_count = 0; user_count < ARRAY_LEN(users); user_count++){
+    if(users[user_count][0][0] == 0) return -1; // Just the initialised value
+    if(strcmp(users[user_count][0], id) == 0) return user_count; // Found User
+  }
+  return -1;
 }
