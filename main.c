@@ -13,7 +13,7 @@ float isUser(BookingID id);
 
 char tables[4][10] = {"Endor", "Naboo", "Tatooine"};
 int sittings[2] = {1700, 1900};
-int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { 0 }; // 0 Means is Free, 1 not Free 
+int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { { 0, 1, 1 } }; // 0 Means is Free, 1 not Free 
 
 /* Format
 * 1 User:
@@ -28,6 +28,8 @@ int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { 0 }; // 0 Mea
 //                           BookingID    DOB       Kids  Adults Board
 char users[100][9][11] = { { "tob123", "21/06/2005", "1", "2", "HB", "A", "B"}, { "dav461" } };
 int main() {
+
+  // Get User ID
   BookingID id;
   printf("\033cPlease enter your Booking ID\t(e.g doe123)\n");
   fgets(id, 7, stdin);
@@ -78,7 +80,11 @@ int main() {
 
   char* end;
   int tn = strtol(tableNum, &end, 10);
-  // printf("%d, %lu", tn, ARRAY_LEN(tables)-2);
+  
+  // 0 to Exit, or not Valid Table
+  if(tn == 0 || tn > ARRAY_LEN(tableAvailable[0]) * 2) return 1;
+
+  // If they have chosen a Table
   if(tn - 1 > ARRAY_LEN(tables) - 2)
   {
     if(tableAvailable[1][tn - ARRAY_LEN(tables)] == 1){
