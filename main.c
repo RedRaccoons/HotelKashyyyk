@@ -13,7 +13,7 @@ float isUser(BookingID id);
 
 char tables[4][10] = {"Endor", "Naboo", "Tatooine"};
 int sittings[2] = {1700, 1900};
-int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { { 0, 1, 1 } }; // 0 Means is Free, 1 not Free 
+int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { { 0 } }; // 0 Means is Free, 1 not Free 
 
 /* Format
 * 1 User:
@@ -25,8 +25,7 @@ int tableAvailable[ARRAY_LEN(sittings)][ARRAY_LEN(tables) - 1] = { { 0, 1, 1 } }
 *   [20] Newpape
 *   [21] Booking
 */
-//                           BookingID    DOB       Kids  Adults Board
-char users[100][9][11] = { { "tob123", "21/06/2005", "1", "2", "HB", "A", "B"}, { "dav461" } };
+char users[100][9][11] = { 0 };
 int main() {
 
   // Get User ID
